@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="zh-Hans">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>保顾智库 · 保险业务 AI 中台</title><meta name="description" content="保险团队经营工作台"><link rel="stylesheet" href="/app.css"><script src="/app.js" defer></script></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>保顾智库 · 保险业务 AI 中台</title><meta name="description" content="保险团队经营与 AI 协作工作台"><link rel="stylesheet" href="/app.css"><link rel="stylesheet" href="/assistants.css"><script src="/assistants.js" defer></script><script src="/app.js" defer></script></head>
 <body>
 <a class="skip-link" href="#workspace">跳到工作台内容</a>
 <div id="insurance-ops" data-state="login">
@@ -12,6 +12,8 @@
       <button data-nav="policies"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6zM14 3v5h5M10 12h5M10 16h5"/></svg>保单明细</button>
       <button data-nav="clients" id="nav-clients" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0116 0v2"/></svg>客户档案</button>
       <button data-nav="ai"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 6.3L21 12l-6.3 2.7L12 21l-2.7-6.3L3 12l6.3-2.7z"/></svg>AI 经营助理<span class="nav-ai">AI</span></button>
+      <button data-nav="assistants"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="6" width="16" height="14" rx="4"/><path d="M12 3v3M8 11h.01M16 11h.01M9 16h6"/></svg>团队 AI 助理<span class="nav-ai">新</span></button>
+      <button data-nav="knowledge" id="nav-knowledge" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6l2 2h8v15H4zM8 11h8M8 15h5"/></svg>团队知识库</button>
     </nav>
     <div class="sidebar-bottom"><div class="sidebar-note"><span class="status-dot"></span>三人演示空间<small>业务数据保存在本机</small></div><div class="sidebar-user"><span class="user-avatar" id="sidebar-avatar">周</span><div id="sidebar-user-name">周宁<small>团队长</small></div></div></div>
   </aside>
@@ -31,7 +33,7 @@
     <div class="breadcrumb" id="io-breadcrumb"></div>
     <div class="intro"><div><h1 id="io-title"></h1><p id="io-subtitle"></p></div><div class="introtools"><label class="sr" for="month">统计月份</label><select id="month"><option value="2026-10">2026 年 10 月</option><option value="2026-09">2026 年 9 月</option><option value="2026-08">2026 年 8 月</option><option value="2026-07">2026 年 7 月</option><option value="2026-06">2026 年 6 月</option><option value="2026-05">2026 年 5 月</option></select><button class="black" id="add-policy">＋ 录入保单</button></div></div>
     <div id="io-content"></div>
-    <footer><span>保顾智库 · 三人演示空间</span><span>首年保费（人民币）· 已生效保单</span></footer>
+    <footer><span>保顾智库 · 启航团队专属空间</span><span id="workspace-footer-note">首年保费（人民币）· 已生效保单</span></footer>
   </main>
   <dialog id="io-collect" aria-labelledby="entry-title">
     <form id="entry-form">

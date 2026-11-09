@@ -3,6 +3,7 @@ import { randomBytes } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { parseArgs } from 'node:util';
 import { openDatabase,dashboard,policiesFor,addPolicy } from './db.mjs';
 import { analyze,aiStatus } from './ai.mjs';
 const here=path.dirname(fileURLToPath(import.meta.url));
@@ -51,9 +52,9 @@ export function createApp({dbPath=path.join(here,'data','insurance.sqlite'),env=
         return json(res,404,{error:'接口不存在'});
       }
       if(req.method!=='GET')return json(res,405,{error:'不支持的请求方式'});
-      const files={'/':'index.html','/app.js':'app.js','/app.css':'app.css','/fonts/round-regular.woff':'fonts/round-regular.woff','/fonts/round-bold.woff':'fonts/round-bold.woff','/fonts/LICENSE.md':'fonts/LICENSE.md'};
+      const files={'/':'index.html','/app.js':'app.js','/app.css':'app.css','/assistants.js':'assistants.js','/assistants.css':'assistants.css','/demo/medical.pdf':'demo/medical.pdf','/demo/critical.pdf':'demo/critical.pdf','/demo/team-guide.pdf':'demo/team-guide.pdf','/demo/objections.pdf':'demo/objections.pdf','/fonts/round-regular.woff':'fonts/round-regular.woff','/fonts/round-bold.woff':'fonts/round-bold.woff','/fonts/LICENSE.md':'fonts/LICENSE.md'};
       if(!files[route])return json(res,404,{error:'页面不存在'});
-      const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.woff':'font/woff','.md':'text/plain; charset=utf-8'};
+      const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.woff':'font/woff','.md':'text/plain; charset=utf-8','.pdf':'application/pdf'};
       res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'");
       const data=await readFile(path.join(here,'public',files[route]));res.writeHead(200,{'Content-Type':types[path.extname(files[route])],'Cache-Control':'no-cache'});res.end(data);
     }catch(error){json(res,error.status||500,{error:error.status?error.message:'服务处理失败，请稍后重试'});}
@@ -62,5 +63,6 @@ export function createApp({dbPath=path.join(here,'data','insurance.sqlite'),env=
   return {server,db};
 }
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
-  const {server}=createApp();server.listen(Number(process.env.PORT||4387),process.env.HOST||'127.0.0.1',()=>console.log('Local: http://localhost:'+server.address().port));
+  const {values}=parseArgs({options:{host:{type:'string'},port:{type:'string'},strictPort:{type:'boolean'}},strict:true});
+  const {server}=createApp();server.listen(Number(values.port||process.env.PORT||4387),values.host||process.env.HOST||'127.0.0.1',()=>console.log('Local: http://localhost:'+server.address().port));
 }

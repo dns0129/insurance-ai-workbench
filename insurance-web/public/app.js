@@ -13,7 +13,7 @@ async function api(url,options={}){
   return body;
 }
 function notify(message){$('notice').textContent=message;$('notice').hidden=false;clearTimeout(noticeTimer);noticeTimer=setTimeout(()=>$('notice').hidden=true,5000);}
-function showLogin(){$("insurance-ops").dataset.state="login";activePage="overview";loadVersion++;me=null;data=null;orders=null;clients=[];selected='';aiAnswer='';$('workspace').hidden=true;$('login').hidden=false;$('io-content').replaceChildren();$('switch-account').hidden=true;$('role-label').textContent='3 人团队演示';chartObserver?.disconnect();}
+function showLogin(){window.InsuranceAssistants.reset();$("insurance-ops").dataset.state="login";activePage="overview";loadVersion++;me=null;data=null;orders=null;clients=[];selected='';aiAnswer='';$('workspace').hidden=true;$('login').hidden=false;$('io-content').replaceChildren();$('switch-account').hidden=true;$('role-label').textContent='3 人团队演示';chartObserver?.disconnect();}
 const options=agents=>agents.map(a=>`<option value="${a.id}">${esc(a.name)} · ${a.id}</option>`).join('');
 const head=(title,subtitle='',extra='')=>`<div class="panelhead"><div><h2>${title}</h2><p>${subtitle}</p></div>${extra}</div>`;
 const track=(value,red=false)=>`<span class="track" aria-hidden="true"><span class="${red?'dangerfill':''}" style="width:${Math.min(100,value)}%"></span></span>`;
@@ -140,14 +140,22 @@ async function init(){
 
 
 function showPage(page){
+  if(page==='knowledge'&&!isLeader())page='assistants';
   activePage=page;
   $('insurance-ops').dataset.state='workspace';
-  const names={overview:isLeader()?'团队经营总览':'我的业绩总览',policies:isLeader()?'团队保单明细':'我的保单明细',ai:'AI 经营助理',clients:'我的客户档案'};
+  const names={overview:isLeader()?'团队经营总览':'我的业绩总览',policies:isLeader()?'团队保单明细':'我的保单明细',ai:'AI 经营助理',clients:'我的客户档案',assistants:'团队 AI 助理',knowledge:'团队知识库'};
   $('io-title').textContent=names[page];
-  $('top-page').textContent={overview:'总览',policies:'保单',ai:'AI 分析',clients:'客户'}[page];
-  $('io-subtitle').textContent=page==='overview'?(isLeader()?'掌握团队进度，把注意力放在关键变化上。':'从业绩到客户，让每一次跟进更有方向。'):page==='policies'?'已生效保单与首年保费，一目了然。':page==='ai'?'理解变化，明确下一步。':'你的客户信息与获客来源。';
+  $('top-page').textContent={overview:'总览',policies:'保单',ai:'AI 分析',clients:'客户',assistants:'团队 AI 助理',knowledge:'知识库管理'}[page];
+  const assistantPage=['assistants','knowledge'].includes(page);
+  $('assistant-section').dataset.section=assistantPage?page:'assistants';
+  $('io-subtitle').textContent=page==='assistants'?'从产品解读到客户沟通，让专业支持随时在身边。':page==='knowledge'?'由团队长管理资料，让每一个回答都有出处。':page==='overview'?(isLeader()?'掌握团队进度，把注意力放在关键变化上。':'从业绩到客户，让每一次跟进更有方向。'):page==='policies'?'已生效保单与首年保费，一目了然。':page==='ai'?'理解变化，明确下一步。':'你的客户信息与获客来源。';
+  document.querySelector('.introtools').hidden=assistantPage;
+  $('workspace-footer-note').textContent=assistantPage?'前端交互演示 · 等待接入团队资料与 AI 服务':'首年保费（人民币）· 已生效保单';
   document.querySelectorAll('[data-section]').forEach(el=>el.hidden=el.dataset.section!==page);
   document.querySelectorAll('#main-nav [data-nav]').forEach(el=>{if(el.dataset.nav===page)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current');});
+  const nav=$('main-nav'),current=nav.querySelector('[aria-current="page"]');
+  if(nav.scrollWidth>nav.clientWidth&&current)nav.scrollTo({left:current.offsetLeft-nav.offsetLeft-12,behavior:'instant'});
+  if(assistantPage)window.InsuranceAssistants.mount($('assistant-root'),{page,actor:me,notify,navigate:showPage});
   if(page==='overview')requestAnimationFrame(drawChart);
 }
 function render(){
@@ -157,8 +165,10 @@ function render(){
   $('sidebar-avatar').textContent=me.name[0];
   $('sidebar-user-name').innerHTML=esc(me.name)+'<small>'+(isLeader()?'团队长':'代理人 · '+me.agent_id)+'</small>';
   $('nav-clients').hidden=isLeader();
+  $('nav-knowledge').hidden=!isLeader();
   $('add-policy').hidden=!isLeader();
-  $('io-content').innerHTML=`<div data-section="overview">${statCards()}<div class="duo">${chartPanel()}${attention()}</div>${isLeader()?members():profilePanels()}</div><div data-section="ai">${aiPanel()}</div><div data-section="policies"><section class="panel full" id="policies">${policyTable()}</section></div>${isLeader()?'':`<div data-section="clients"><section class="panel full" id="clients">${clientTable()}</section></div>`}`;
+  $('io-content').innerHTML=`<div data-section="overview">${statCards()}<div class="duo">${chartPanel()}${attention()}</div>${isLeader()?members():profilePanels()}</div><div data-section="ai">${aiPanel()}</div><div data-section="policies"><section class="panel full" id="policies">${policyTable()}</section></div>${isLeader()?'':`<div data-section="clients"><section class="panel full" id="clients">${clientTable()}</section></div>`}<div data-section="assistants" id="assistant-section"><div id="assistant-root"></div></div>`;
+  $('assistant-section').dataset.section=['assistants','knowledge'].includes(activePage)?activePage:'assistants';
   if(isLeader()){$('chart-agent').value=selected;$('member-status').value=status;}
   showPage(activePage);
   chartObserver?.disconnect();chartObserver=new ResizeObserver(drawChart);chartObserver.observe($('chart'));drawChart();
