@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>保顾智库 · 保险业务 AI 中台</title><meta name="description" content="保险团队经营工作台"><link rel="stylesheet" href="/app.css"><script src="/app.js" defer></script></head>
+<body>
+<a class="skip-link" href="#workspace">跳到工作台内容</a>
+<div id="insurance-ops" data-state="login">
+  <aside class="sidebar" aria-label="工作台导航">
+    <div class="brand"><span class="mark">保</span><div>保顾智库<small>保险团队经营工作台</small></div></div>
+    <div class="team-label"><span class="team-seal">启</span><div>启航保险团队<small>团队协作空间</small></div></div>
+    <nav id="main-nav" aria-label="主要导航">
+      <button data-nav="overview" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>经营总览</button>
+      <button data-nav="policies"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6zM14 3v5h5M10 12h5M10 16h5"/></svg>保单明细</button>
+      <button data-nav="clients" id="nav-clients" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0116 0v2"/></svg>客户档案</button>
+      <button data-nav="ai"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 6.3L21 12l-6.3 2.7L12 21l-2.7-6.3L3 12l6.3-2.7z"/></svg>AI 经营助理<span class="nav-ai">AI</span></button>
+    </nav>
+    <div class="sidebar-bottom"><div class="sidebar-note"><span class="status-dot"></span>三人演示空间<small>业务数据保存在本机</small></div><div class="sidebar-user"><span class="user-avatar" id="sidebar-avatar">周</span><div id="sidebar-user-name">周宁<small>团队长</small></div></div></div>
+  </aside>
+  <header class="top"><div class="brand"><span class="mark">保</span><div>保顾智库<small>保险业务 AI 中台</small></div></div><span class="top-label">经营工作台 <span>/</span> <span id="top-page">总览</span></span><div class="top-account"><span id="role-label">3 人团队演示</span><button id="switch-account" class="quiet" hidden>切换账号</button></div></header>
+  <section id="login" class="login">
+    <div class="login-copy"><span class="login-tag">为保险团队而设计</span><h1>看清团队进度，<br>找到下一步重点。</h1><p>业绩、保单与客户洞察，<br>在一个工作台中有序协作。</p><div class="login-illustration" aria-label="三个成员代表已达标、接近目标和重点预警"><div><span>苏晴 <small>已达标</small></span><i style="--bar:100%"></i></div><div><span>许佳 <small>接近目标</small></span><i style="--bar:82%"></i></div><div class="red"><span>林晓 <small>! 重点预警</small></span><i style="--bar:32%"></i></div></div><small>3 位员工 · 6 个月历史 · 3 种目标状态</small></div>
+    <form id="login-form" class="panel login-panel">
+      <h2>进入经营工作台</h2><p>选择一个演示身份开始体验</p>
+      <div class="role-options"><label><input type="radio" name="role" value="leader" checked> 团队长</label><label><input type="radio" name="role" value="agent"> 代理人</label></div>
+      <label id="agent-login-label" hidden>代理人账号<select id="login-agent" name="agent_id"></select></label>
+      <p id="login-description">查看 3 位成员的业绩，分析走势并录入保单。</p>
+      <button class="black" type="submit" id="login-submit">进入团队长工作台</button>
+      <small>演示登录可选择任意模拟账号；进入后由后端按角色提供数据。</small>
+    </form>
+  </section>
+  <main class="workspace" id="workspace" hidden>
+    <div class="breadcrumb" id="io-breadcrumb"></div>
+    <div class="intro"><div><h1 id="io-title"></h1><p id="io-subtitle"></p></div><div class="introtools"><label class="sr" for="month">统计月份</label><select id="month"><option value="2026-10">2026 年 10 月</option><option value="2026-09">2026 年 9 月</option><option value="2026-08">2026 年 8 月</option><option value="2026-07">2026 年 7 月</option><option value="2026-06">2026 年 6 月</option><option value="2026-05">2026 年 5 月</option></select><button class="black" id="add-policy">＋ 录入保单</button></div></div>
+    <div id="io-content"></div>
+    <footer><span>保顾智库 · 三人演示空间</span><span>首年保费（人民币）· 已生效保单</span></footer>
+  </main>
+  <dialog id="io-collect" aria-labelledby="entry-title">
+    <form id="entry-form">
+      <div class="panelhead"><div><h2 id="entry-title">录入保单</h2><p>保存后联动更新业绩、目标和走势</p></div><button type="button" class="quiet" data-action="close">关闭</button></div>
+      <div class="formgrid">
+        <label>归属代理人<select name="agent_id" id="entry-agent" required></select></label>
+        <label>客户档案<select name="client_id" id="entry-client" required></select></label>
+        <label>保单号<input name="id" required minlength="3" maxlength="40" pattern="[-A-Za-z0-9]{3,40}" placeholder="例如 PA-202610-NEW01"></label>
+        <label>险种<select name="product"><option>重疾险</option><option>寿险</option><option>医疗险</option><option>意外险</option></select></label>
+        <label>开单日期<input type="date" name="date" min="2026-05-01" max="2026-10-31" required></label>
+        <label>首年保费（元）<input name="premium" type="number" min="0.01" max="10000000" step="0.01" required placeholder="4800.00"></label>
+      </div><p class="formnotice">选择该代理人名下的客户。当前演示可录入 2026 年 5–10 月已生效保单。</p><p id="entry-error" class="red" role="alert"></p>
+      <div class="formactions"><button type="button" class="quiet" data-action="close">取消</button><button id="entry-save" class="black">保存保单</button></div>
+    </form>
+  </dialog>
+  <div id="notice" role="status" hidden></div>
+</div>
+</body></html>
