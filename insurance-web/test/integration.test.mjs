@@ -40,6 +40,21 @@ test('越权查询和写入均被拒绝',async()=>{
   assert.ok(rows.every(p=>p.agent_id==='A006'));
   assert.equal((await req('/clients',{cookie:agent})).data.items.length,30);
 });
+test('兼职与全职演示各自使用会话身份的业绩、目标和佣金',async()=>{
+  const directory=(await req('/demo-accounts')).data.agents;
+  assert.equal(directory.find(a=>a.id==='A006').demoEmployment,'兼职');
+  assert.equal(directory.find(a=>a.id==='A001').demoEmployment,'全职');
+  const full=(await req('/login',{body:{role:'agent',agent_id:'A001'}})).cookie;
+  const part=(await req('/dashboard?month=2026-10&agent=A001',{cookie:agent})).data;
+  const own=(await req('/dashboard?month=2026-10&agent=A006',{cookie:full})).data;
+  assert.deepEqual(part.agents.map(a=>[a.id,a.actual,a.target]),[['A006',32000,100000]]);
+  assert.deepEqual(own.agents.map(a=>[a.id,a.actual,a.target]),[['A001',128000,100000]]);
+  assert.deepEqual(part.personal.commission.rows.map(r=>r.id),['P-01','P-02','P-03']);
+  assert.deepEqual(own.personal.commission.rows.map(r=>r.id),['F-01','F-02','F-03']);
+  assert.ok(part.personal.commission.simulated&&part.personal.activities.simulated);
+  assert.deepEqual((await req('/dashboard?month=2026-09',{cookie:agent})).data.personal.commission.rows,[]);
+  assert.equal((await req('/dashboard',{cookie:leader})).data.personal,undefined);
+});
 test('录入更新计数、差额和历史；验证重复、归属、金额与非法日期',async()=>{
   const body={id:'QA-POLICY-001',agent_id:'A006',client_id:'A006C01',product:'重疾险',date:'2026-10-31',premium:'1234.56'};
   assert.equal((await req('/policies',{cookie:leader,body})).status,201);

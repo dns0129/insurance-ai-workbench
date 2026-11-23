@@ -2,3 +2,6 @@
 data/
 node_modules/
 test-results/
+.tools/
+.venv-knowledge/
+__pycache__/
